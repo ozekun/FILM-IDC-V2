@@ -11,10 +11,25 @@
     />
   </head>
   <body class="bg-gray-900 text-white p-6">
-    <div class="max-w-4xl mx-auto">
-      <h1 class="text-3xl font-bold text-center mb-6">Movie List</h1>
+    <div class="max-w-4xl mx-auto p-6">
+      <div class="flex items-center justify-between mb-6">
+        <!-- Tombol Go to Home -->
+        <button
+          onclick="window.location.href='home.html'"
+          class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded shadow-lg"
+        >
+          Go to Home
+        </button>
 
-      <!-- COBA LAGI -->
+        <!-- Spacer agar judul tetap di tengah -->
+        <div class="flex-1"></div>
+
+        <!-- Judul Movie List tetap di tengah -->
+        <h1 class="text-3xl font-bold text-center flex-1 mr-8">Movie List</h1>
+
+        <!-- Spacer agar tombol tidak bergeser -->
+        <div class="flex-1"></div>
+      </div>
 
       <!-- Swiper Slider -->
       <div class="swiper mySwiper mb-6">
@@ -45,8 +60,6 @@
         <div class="swiper-button-next"></div>
         <div class="swiper-button-prev"></div>
       </div>
-
-      //coba
 
       <form id="movieForm" class="grid grid-cols-2 gap-4 mb-6">
         <input
@@ -115,72 +128,118 @@
         },
       });
 
-      const movieForm = document.getElementById("movieForm");
-      const movieList = document.getElementById("movieList");
-      let movies = JSON.parse(localStorage.getItem("movies")) || [];
+      // const movieForm = document.getElementById("movieForm");
+      // const movieList = document.getElementById("movieList");
+      // let movies = JSON.parse(localStorage.getItem("movies")) || [];
 
-      function saveMovies() {
-        localStorage.setItem("movies", JSON.stringify(movies));
-      }
+      // function saveMovies() {
+      //   localStorage.setItem("movies", JSON.stringify(movies));
+      // }
 
-      movieForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-        const movie = {
-          id: Date.now(),
-          title: document.getElementById("title").value,
-          director: document.getElementById("director").value,
-          duration: document.getElementById("duration").value,
-          year: document.getElementById("year").value,
-          genre: document.getElementById("genre").value,
-          rating: document.getElementById("rating").value,
-        };
-        movies.push(movie);
-        saveMovies();
-        renderMovies();
-        movieForm.reset();
+      // movieForm.addEventListener("submit", function (event) {
+      //   event.preventDefault();
+      //   const movie = {
+      //     id: Date.now(),
+      //     title: document.getElementById("title").value,
+      //     director: document.getElementById("director").value,
+      //     duration: document.getElementById("duration").value,
+      //     year: document.getElementById("year").value,
+      //     genre: document.getElementById("genre").value,
+      //     rating: document.getElementById("rating").value,
+      //   };
+      //   movies.push(movie);
+      //   saveMovies();
+      //   renderMovies();
+      //   movieForm.reset();
+      // });
+
+      // function renderMovies() {
+      //   movieList.innerHTML = "";
+      //   movies.forEach((movie) => {
+      //     const movieCard = document.createElement("div");
+      //     movieCard.className = "bg-gray-800 p-4 rounded-lg shadow-lg";
+      //     movieCard.innerHTML = `
+      //       <h2 class="text-xl font-bold">${movie.title}</h2>
+      //       <p class="text-gray-400">Director: ${movie.director}</p>
+      //       <p class="text-gray-400">Duration: ${movie.duration} min</p>
+      //       <p class="text-gray-400">Year: ${movie.year}</p>
+      //       <p class="text-gray-400">Genre: ${movie.genre}</p>
+      //       <p class="text-yellow-400">⭐ ${movie.rating}</p>
+      //       <div class="mt-2 flex space-x-2">
+      //         <button onclick="editMovie(${movie.id})" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded">Edit</button>
+      //         <button onclick="deleteMovie(${movie.id})" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded">Delete</button>
+      //       </div>
+      //     `;
+      //     movieList.appendChild(movieCard);
+      //   });
+      // }
+
+      // function editMovie(id) {
+      //   const movie = movies.find((m) => m.id === id);
+      //   document.getElementById("title").value = movie.title;
+      //   document.getElementById("director").value = movie.director;
+      //   document.getElementById("duration").value = movie.duration;
+      //   document.getElementById("year").value = movie.year;
+      //   document.getElementById("genre").value = movie.genre;
+      //   document.getElementById("rating").value = movie.rating;
+      //   movies = movies.filter((m) => m.id !== id);
+      //   saveMovies();
+      //   renderMovies();
+      // }
+
+      // function deleteMovie(id) {
+      //   movies = movies.filter((m) => m.id !== id);
+      //   saveMovies();
+      //   renderMovies();
+      // }
+
+      // document.addEventListener("DOMContentLoaded", renderMovies);
+    </script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const editMovie = JSON.parse(localStorage.getItem("editMovie"));
+        let movies = JSON.parse(localStorage.getItem("movies")) || [];
+
+        if (editMovie) {
+          document.getElementById("title").value = editMovie.title;
+          document.getElementById("director").value = editMovie.director;
+          document.getElementById("duration").value = editMovie.duration;
+          document.getElementById("year").value = editMovie.year;
+          document.getElementById("genre").value = editMovie.genre;
+          document.getElementById("rating").value = editMovie.rating;
+        }
+
+        document
+          .getElementById("movieForm")
+          .addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const updatedMovie = {
+              id: editMovie ? editMovie.id : Date.now(), // Pakai ID lama jika edit
+              title: document.getElementById("title").value,
+              director: document.getElementById("director").value,
+              duration: document.getElementById("duration").value,
+              year: document.getElementById("year").value,
+              genre: document.getElementById("genre").value,
+              rating: document.getElementById("rating").value,
+            };
+
+            if (editMovie) {
+              // Jika edit, cari film lama dan update datanya
+              movies = movies.map((movie) =>
+                movie.id === editMovie.id ? updatedMovie : movie
+              );
+              localStorage.removeItem("editMovie"); // Hapus data edit setelah selesai
+            } else {
+              // Jika tambah data baru
+              movies.push(updatedMovie);
+            }
+
+            localStorage.setItem("movies", JSON.stringify(movies));
+            window.location.href = "home.html"; // Kembali ke home setelah edit/simpan
+          });
       });
-
-      function renderMovies() {
-        movieList.innerHTML = "";
-        movies.forEach((movie) => {
-          const movieCard = document.createElement("div");
-          movieCard.className = "bg-gray-800 p-4 rounded-lg shadow-lg";
-          movieCard.innerHTML = `
-            <h2 class="text-xl font-bold">${movie.title}</h2>
-            <p class="text-gray-400">Director: ${movie.director}</p>
-            <p class="text-gray-400">Duration: ${movie.duration} min</p>
-            <p class="text-gray-400">Year: ${movie.year}</p>
-            <p class="text-gray-400">Genre: ${movie.genre}</p>
-            <p class="text-yellow-400">⭐ ${movie.rating}</p>
-            <div class="mt-2 flex space-x-2">
-              <button onclick="editMovie(${movie.id})" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded">Edit</button>
-              <button onclick="deleteMovie(${movie.id})" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded">Delete</button>
-            </div>
-          `;
-          movieList.appendChild(movieCard);
-        });
-      }
-
-      function editMovie(id) {
-        const movie = movies.find((m) => m.id === id);
-        document.getElementById("title").value = movie.title;
-        document.getElementById("director").value = movie.director;
-        document.getElementById("duration").value = movie.duration;
-        document.getElementById("year").value = movie.year;
-        document.getElementById("genre").value = movie.genre;
-        document.getElementById("rating").value = movie.rating;
-        movies = movies.filter((m) => m.id !== id);
-        saveMovies();
-        renderMovies();
-      }
-
-      function deleteMovie(id) {
-        movies = movies.filter((m) => m.id !== id);
-        saveMovies();
-        renderMovies();
-      }
-
-      document.addEventListener("DOMContentLoaded", renderMovies);
     </script>
   </body>
 </html>
